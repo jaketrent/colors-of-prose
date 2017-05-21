@@ -27,68 +27,60 @@
     </style>
   </head>
   <body>
+
     <p contenteditable id="prose">
       This is your prose
       And this is what it's like.
     </p>
+
     <script>
-      function mapToHexValues(str) {
-        var alphanumerics = '0123456789abcdefghijklmnopqrstuvwxyz'
-        var hexes = '0123456789abcdef'
-        return str.split('').map(function (letter) {
-          var alphaIndex = alphanumerics.indexOf(letter)
-          return alphaIndex <= hexes.length
-            ? hexes[alphaIndex]
-            : hexes[alphaIndex % hexes.length]
-        }).filter(function (hex) { return hex })
-        /* var hex = /[abcdef0-9]/i
-         * return str.split('').map(function (letter) {
-         *   return hex.test(letter) ? letter : null
-         * }).filter(function (hex) { return hex })*/
+
+      const hexValueSpace = letter => {
+        const alphanumerics = '0123456789abcdefghijklmnopqrstuvwxyz'
+        const hexes = '0123456789abcdef'
+        const alphaIndex = alphanumerics.indexOf(letter)
+        return alphaIndex <= hexes.length
+          ? hexes[alphaIndex]
+          : hexes[alphaIndex % hexes.length]
       }
 
-     function completeColor(color) {
-       return color.length === 6
-                              ? color
-                              : (color + '000000').slice(0, 6)
-     }
+      const dropUnmapped = hex => hex
 
-     const prefixHash = color => '#' + color
+      const separateHexColors = (hexes, str) => {
+        const lastHex = hexes[hexes.length - 1 || 0]
+        if (lastHex.length < 6) {
+          hexes[hexes.length - 1] = lastHex + str
+        } else {
+          hexes.push(str)
+        }
+        return hexes
+      }
 
-     function mapToHexColors(strs) {
-       return strs.reduce(function (hexes, str) {
-         var lastHex = hexes[hexes.length - 1 || 0]
-         if (lastHex.length < 6) {
-           hexes[hexes.length - 1] = lastHex + str
-         } else {
-           hexes.push(str)
-         }
-         return hexes
-       }, ['']).map(completeColor).map(prefixHash)
-     }
+      const completeColor = color => color.length === 6 ? color : (color + '000000').slice(0, 6)
 
-     function formatGradient(hexes) {
-       return 'background: linear-gradient(to bottom, ' + hexes.join(', ') + ')'
-     }
+      const prefixHash = color => '#' + color
 
-      var prose = document.getElementById('prose')
-      console.log('prose', prose)
-      console.log('hex', mapToHexValues(prose.innerHTML))
-      console.log('colors', mapToHexColors(mapToHexValues(prose.innerHTML)))
-      document.body.setAttribute('style', formatGradient(mapToHexColors(mapToHexValues(prose.innerHTML))))
+      const formatStyle = (_style, _hex, i, hexes) => {
+        if (i === hexes.length - 1)
+          return 'background: linear-gradient(to bottom, ' + hexes.join(', ') + ')'
+      }
 
-     const mapToGradient = str =>
-       formatGradient(mapToHexColors(mapToHexValues(str)))
+      const mapToGradient = str =>
+        str.split('')
+          .map(hexValueSpace)
+          .filter(dropUnmapped)
+          .reduce(separateHexColors, [''])
+          .map(completeColor)
+          .map(prefixHash)
+          .reduce(formatStyle)
 
-     const setGradientOn = (el, str) => el.setAttribute('style', mapToGradient(str))
+      const setGradientOn = (el, str) => el.setAttribute('style', mapToGradient(str))
 
-     function handleProseChange(evt) {
-       setGradientOn(document.body, evt.target.innerHTML)
-     }
+      const handleProseChange = evt => setGradientOn(document.body, evt.target.innerText)
 
-     ;['blur', 'keyup', 'paste', 'copy', 'cut', 'mouseup'].forEach(evtName => prose.addEventListener(evtName, handleProseChange))
-
-     setGradientOn(document.body, prose.innerHTML)
+      const prose = document.getElementById('prose')
+      ;['blur', 'keyup', 'paste', 'copy', 'cut', 'mouseup'].forEach(evtName => prose.addEventListener(evtName, handleProseChange))
+      setGradientOn(document.body, prose.innerText)
     </script>
   </body>
 </html>
