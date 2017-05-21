@@ -51,7 +51,7 @@
 
     <script>
 
-      const hexValueSpace = letter => {
+      const toHexValueSpace = letter => {
         const alphanumerics = '0123456789abcdefghijklmnopqrstuvwxyz'
         const hexes = '0123456789abcdef'
         const alphaIndex = alphanumerics.indexOf(letter)
@@ -83,7 +83,7 @@
 
       const mapToGradient = str =>
         str.split('')
-          .map(hexValueSpace)
+          .map(toHexValueSpace)
           .filter(dropUnmapped)
           .reduce(separateHexColors, [''])
           .map(completeColor)
