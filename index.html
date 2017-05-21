@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <title></title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        background: grey;
+      }
+      p {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        justify-content: flex-start;
+        align-items: center;
+        overflow: hidden;
+        margin: 0;
+        padding: 36px;
+        font-family: sans-serif;
+        font-size: 36px;
+        line-height: 42px;
+        color: white;
+        white-space: pre;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+      }
+    </style>
+  </head>
+  <body>
+    <p contenteditable id="prose">
+      This is your prose
+      And this is what it's like.
+    </p>
+    <script>
+      function mapToHexValues(str) {
+        var alphanumerics = '0123456789abcdefghijklmnopqrstuvwxyz'
+        var hexes = '0123456789abcdef'
+        return str.split('').map(function (letter) {
+          var alphaIndex = alphanumerics.indexOf(letter)
+          return alphaIndex <= hexes.length
+            ? hexes[alphaIndex]
+            : hexes[alphaIndex % hexes.length]
+        }).filter(function (hex) { return hex })
+        /* var hex = /[abcdef0-9]/i
+         * return str.split('').map(function (letter) {
+         *   return hex.test(letter) ? letter : null
+         * }).filter(function (hex) { return hex })*/
+      }
+
+     function completeColor(color) {
+       return color.length === 6
+                              ? color
+                              : (color + '000000').slice(0, 6)
+     }
+
+     const prefixHash = color => '#' + color
+
+     function mapToHexColors(strs) {
+       return strs.reduce(function (hexes, str) {
+         var lastHex = hexes[hexes.length - 1 || 0]
+         if (lastHex.length < 6) {
+           hexes[hexes.length - 1] = lastHex + str
+         } else {
+           hexes.push(str)
+         }
+         return hexes
+       }, ['']).map(completeColor).map(prefixHash)
+     }
+
+     function formatGradient(hexes) {
+       return 'background: linear-gradient(to bottom, ' + hexes.join(', ') + ')'
+     }
+
+      var prose = document.getElementById('prose')
+      console.log('prose', prose)
+      console.log('hex', mapToHexValues(prose.innerHTML))
+      console.log('colors', mapToHexColors(mapToHexValues(prose.innerHTML)))
+      document.body.setAttribute('style', formatGradient(mapToHexColors(mapToHexValues(prose.innerHTML))))
+
+     const mapToGradient = str =>
+       formatGradient(mapToHexColors(mapToHexValues(str)))
+
+     const setGradientOn = (el, str) => el.setAttribute('style', mapToGradient(str))
+
+     function handleProseChange(evt) {
+       setGradientOn(document.body, evt.target.innerHTML)
+     }
+
+     ;['blur', 'keyup', 'paste', 'copy', 'cut', 'mouseup'].forEach(evtName => prose.addEventListener(evtName, handleProseChange))
+
+     setGradientOn(document.body, prose.innerHTML)
+    </script>
+  </body>
+</html>
