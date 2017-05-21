@@ -1,6 +1,7 @@
 <html>
   <head>
     <title>The Colors of Prose</title>
+
     <link rel="shortcut icon" type="image/png" href="/favicon.png" />
     <style>
       * {
@@ -8,8 +9,14 @@
       }
       body {
         background: grey;
+        font-family: sans-serif;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
       }
-      p {
+      a {
+        color: inherit;
+      }
+      .prose {
         display: flex;
         height: 100%;
         width: 100%;
@@ -18,22 +25,29 @@
         overflow: hidden;
         margin: 0;
         padding: 36px;
-        font-family: sans-serif;
         font-size: 36px;
         line-height: 42px;
-        color: white;
         white-space: pre;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
       }
+     .credit {
+       position: fixed;
+       font-size: 12px;
+       bottom: 6px;
+       right: 6px;
+     }
     </style>
   </head>
   <body>
 
-    <p contenteditable id="prose">
+    <p contenteditable id="prose" class="prose">
       Can you paint
       with all the colors
       of your prose?
     </p>
+
+    <div class="credit">
+      From the colorful <a href="https://jaketrent.com">Jake Trent</a>
+    </div>
 
     <script>
 
